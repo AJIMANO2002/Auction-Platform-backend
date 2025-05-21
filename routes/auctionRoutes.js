@@ -5,7 +5,6 @@ import Auction from '../models/Auction.js';
 
 const router = express.Router();
 
-// Create new auction
 router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const { title, description, image, startingprice, auctionType, endTime } = req.body;
@@ -28,7 +27,6 @@ router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   }
 });
 
-// Get all auctions
 router.get('/', async (req, res) => {
   try {
     const auctions = await Auction.find().populate('seller', 'name email');
@@ -38,7 +36,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get seller's auctions
 router.get('/my-auctions', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auctions = await Auction.find({ seller: req.user.userId }).sort({ createdAt: -1 });
@@ -48,7 +45,6 @@ router.get('/my-auctions', authMiddleware, sellerMiddleware, async (req, res) =>
   }
 });
 
-// Get single auction
 router.get('/:id', async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id).populate('seller', 'name email');
@@ -59,11 +55,12 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update auction
 router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOne({ _id: req.params.id, seller: req.user.userId });
-    if (!auction) return res.status(404).json({ message: 'Auction not found or unauthorized' });
+    if (!auction) {
+      return res.status(404).json({ message: 'Auction not found or unauthorized' });
+    }
 
     const { title, description, image, startingprice, auctionType, endTime, status } = req.body;
 
@@ -82,7 +79,7 @@ router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   }
 });
 
-// Delete auction
+
 router.delete('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOneAndDelete({ _id: req.params.id, seller: req.user.userId });

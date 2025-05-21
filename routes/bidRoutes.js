@@ -54,7 +54,6 @@ router.get("/:auctionId", async (req, res) => {
   }
 });
 
-// ✅ Get User's Bidding History
 router.get("/user/history", authMiddleware, async (req, res) => {
   try {
     const userBids = await Bid.find({ bidder: req.user.userId }).populate("auction", "title");
