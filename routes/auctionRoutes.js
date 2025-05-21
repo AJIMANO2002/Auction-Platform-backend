@@ -60,7 +60,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update auction
-router.put('/edit/:id', authMiddleware, sellerMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOne({ _id: req.params.id, seller: req.user.userId });
     if (!auction) return res.status(404).json({ message: 'Auction not found or unauthorized' });
