@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const auctionSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    description: { type: String, required: true }, // ✅ fixed here
+    description: { type: String, required: true },
     image: { type: String },
     startingprice: { type: Number, required: true },
     currentBid: { type: Number, default: 0 },
@@ -22,7 +22,7 @@ const auctionSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Bid",
       },
-    ], // ✅ fixed here
+    ],
     status: {
       type: String,
       enum: ["active", "inactive"],

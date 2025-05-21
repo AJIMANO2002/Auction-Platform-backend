@@ -1,15 +1,15 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
+import sellerMiddleware from '../middleware/SellerMiddleware.js';
 import Auction from '../models/Auction.js';
 
 const router = express.Router();
 
-// ✅ Create new auction (Protected)
-router.post('/', authMiddleware, async (req, res) => {
-  const { title, description, image, startingprice, auctionType, endTime } = req.body;
-  const sellerId = req.user.userId;
-
+// Create new auction
+router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
+    const { title, description, image, startingprice, auctionType, endTime } = req.body;
+
     const auction = new Auction({
       title,
       description,
@@ -18,53 +18,52 @@ router.post('/', authMiddleware, async (req, res) => {
       currentBid: startingprice,
       auctionType,
       endTime,
-      seller: sellerId,
+      seller: req.user.userId,
     });
 
     await auction.save();
-    res.status(201).json({ message: "Auction created", auction });
+    res.status(201).json({ message: 'Auction created successfully', auction });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// ✅ Get all auctions (Public)
+// Get all auctions
 router.get('/', async (req, res) => {
   try {
-    const auctions = await Auction.find().populate("seller", "name email");
+    const auctions = await Auction.find().populate('seller', 'name email');
     res.json(auctions);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// ✅ Get seller's own auctions (Protected) ✅ KEEP THIS ABOVE /:id
-router.get('/my-auctions', authMiddleware, async (req, res) => {
+// Get seller's auctions
+router.get('/my-auctions', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auctions = await Auction.find({ seller: req.user.userId }).sort({ createdAt: -1 });
     res.json(auctions);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// ✅ Get auction by ID (Public)
+// Get single auction
 router.get('/:id', async (req, res) => {
   try {
-    const auction = await Auction.findById(req.params.id).populate("seller", "name email");
-    if (!auction) return res.status(404).json({ message: "Auction not found" });
+    const auction = await Auction.findById(req.params.id).populate('seller', 'name email');
+    if (!auction) return res.status(404).json({ message: 'Auction not found' });
     res.json(auction);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// ✅ Edit auction (Protected)
-router.put('/edit/:id', authMiddleware, async (req, res) => {
+// Update auction
+router.put('/edit/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOne({ _id: req.params.id, seller: req.user.userId });
-
-    if (!auction) return res.status(404).json({ message: "Auction not found or unauthorized" });
+    if (!auction) return res.status(404).json({ message: 'Auction not found or unauthorized' });
 
     const { title, description, image, startingprice, auctionType, endTime, status } = req.body;
 
@@ -77,21 +76,20 @@ router.put('/edit/:id', authMiddleware, async (req, res) => {
     auction.status = status || auction.status;
 
     await auction.save();
-    res.json({ message: "Auction updated", auction });
+    res.json({ message: 'Auction updated successfully', auction });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// ✅ Delete auction (Protected)
-router.delete('/:id', authMiddleware, async (req, res) => {
+// Delete auction
+router.delete('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOneAndDelete({ _id: req.params.id, seller: req.user.userId });
-    if (!auction) return res.status(404).json({ message: "Auction not found or unauthorized" });
-
-    res.json({ message: "Auction deleted" });
+    if (!auction) return res.status(404).json({ message: 'Auction not found or unauthorized' });
+    res.json({ message: 'Auction deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
