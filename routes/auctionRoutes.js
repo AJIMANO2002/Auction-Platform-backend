@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
-    const { title, description, image, startingprice, auctionType, endTime } = req.body;
+    const { title, description, image, startingprice, auctionType,startTime, endTime } = req.body;
 
     const auction = new Auction({
       title,
@@ -16,6 +16,7 @@ router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
       startingprice,
       currentBid: startingprice,
       auctionType,
+      startTime,
       endTime,
       seller: req.user.userId,
     });
@@ -62,7 +63,7 @@ router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Auction not found or unauthorized' });
     }
 
-    const { title, description, image, startingprice, auctionType, endTime, status } = req.body;
+    const { title, description, image, startingprice, auctionType,startTime, endTime, status } = req.body;
 
     auction.title = title || auction.title;
     auction.description = description || auction.description;
@@ -70,6 +71,7 @@ router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
     auction.startingprice = startingprice || auction.startingprice;
     auction.auctionType = auctionType || auction.auctionType;
     auction.endTime = endTime || auction.endTime;
+    auction.startTime = startTime || auction.startTime;
     auction.status = status || auction.status;
 
     await auction.save();
