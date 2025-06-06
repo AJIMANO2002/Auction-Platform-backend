@@ -28,10 +28,15 @@ const auctionSchema = new mongoose.Schema(
       enum: ["active", "inactive"],
       default: "active",
     },
+
+    // ✅ Required for live/upcoming/ended filtering
+    startTime: { type: Date, required: true },
+
     endTime: { type: Date, required: true },
   },
   { timestamps: true }
 );
 
 const Auction = mongoose.model("Auction", auctionSchema);
+
 export default Auction;
