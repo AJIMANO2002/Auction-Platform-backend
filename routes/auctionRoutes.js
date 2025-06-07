@@ -8,15 +8,7 @@ const router = express.Router();
 // ✅ Create Auction
 router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      image,
-      startingprice,
-      auctionType,
-      startTime,
-      endTime,
-    } = req.body;
+    const { title, description, image, startingprice, auctionType, startTime, endTime, } = req.body;
 
     const auction = new Auction({
       title,
@@ -31,6 +23,7 @@ router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
     });
 
     await auction.save();
+    console.log("New Auction ID:", auction._id);
     res.status(201).json({ message: 'Auction created successfully', auction });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -99,6 +92,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+
 // ✅ Update Auction (Seller-only)
 router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
@@ -107,7 +102,8 @@ router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
     // Debug logs for troubleshooting 404 error
     console.log("Request ID:", req.params.id);
     console.log("Logged-in User ID:", req.user.userId);
-
+ console.log("Auction ID:", req.params.id);
+  console.log("User ID:", req.user.userId);
     if (!auction) {
       return res.status(404).json({ message: 'Auction not found or unauthorized' });
     }
