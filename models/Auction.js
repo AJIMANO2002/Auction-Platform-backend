@@ -29,7 +29,6 @@ const auctionSchema = new mongoose.Schema(
       default: "active",
     },
 
-    // ✅ Required for live/upcoming/ended filtering
     startTime: { type: Date, required: true },
 
     endTime: { type: Date, required: true },

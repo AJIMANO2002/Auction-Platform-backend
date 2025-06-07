@@ -5,7 +5,6 @@ import Auction from '../models/Auction.js';
 
 const router = express.Router();
 
-// ✅ Create Auction
 router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const { title, description, image, startingprice, auctionType, startTime, endTime, } = req.body;
@@ -30,7 +29,6 @@ router.post('/', authMiddleware, sellerMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Get All Auctions
 router.get('/', async (req, res) => {
   try {
     const auctions = await Auction.find().populate('seller', 'name email');
@@ -40,7 +38,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ Get Auctions by Status (live, upcoming, ended)
 router.get('/status/:type', async (req, res) => {
   try {
     const { type } = req.params;
@@ -71,7 +68,7 @@ router.get('/status/:type', async (req, res) => {
   }
 });
 
-// ✅ Get My Auctions (for seller)
+
 router.get('/my-auctions', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auctions = await Auction.find({ seller: req.user.userId }).sort({ createdAt: -1 });
@@ -81,7 +78,6 @@ router.get('/my-auctions', authMiddleware, sellerMiddleware, async (req, res) =>
   }
 });
 
-// ✅ Get Auction by ID
 router.get('/:id', async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id).populate('seller', 'name email');
@@ -94,16 +90,13 @@ router.get('/:id', async (req, res) => {
 
 
 
-// ✅ Update Auction (Seller-only)
 router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOne({ _id: req.params.id, seller: req.user.userId });
 
-    // Debug logs for troubleshooting 404 error
     console.log("Request ID:", req.params.id);
     console.log("Logged-in User ID:", req.user.userId);
- console.log("Auction ID:", req.params.id);
-  console.log("User ID:", req.user.userId);
+ 
     if (!auction) {
       return res.status(404).json({ message: 'Auction not found or unauthorized' });
     }
@@ -135,7 +128,6 @@ router.put('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Delete Auction
 router.delete('/:id', authMiddleware, sellerMiddleware, async (req, res) => {
   try {
     const auction = await Auction.findOneAndDelete({ _id: req.params.id, seller: req.user.userId });
